@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import jsPDF from "jspdf";
 
 export default function Home() {
   const [form, setForm] = useState({
@@ -38,6 +39,21 @@ export default function Home() {
     }
   };
 
+  const exportToPDF = () => {
+    const doc = new jsPDF();
+
+    doc.setFontSize(18);
+    doc.text("SurpriseHub – Gift Ideas", 14, 20);
+
+    doc.setFontSize(12);
+
+    ideas.forEach((idea, index) => {
+      doc.text(`${index + 1}. ${idea}`, 14, 35 + index * 10);
+    });
+
+    doc.save("surprisehub-gift-ideas.pdf");
+  };
+
   return (
     <div
       style={{
@@ -48,6 +64,16 @@ export default function Home() {
       }}
     >
       {" "}
+      <img
+        src="/surprisehub_logo.svg"
+        alt="SurpriseHub Logo"
+        style={{
+          width: "90px",
+          height: "90px",
+          display: "block",
+          margin: "0 auto 1.5rem auto",
+        }}
+      />
       <h1
         style={{
           textAlign: "center",
@@ -56,8 +82,22 @@ export default function Home() {
           fontSize: "2.5rem",
         }}
       >
-        🎁 SurpriseHub
+        SurpriseHub
       </h1>
+      <p
+        style={{
+          textAlign: "center",
+          maxWidth: "600px",
+          margin: "0 auto 2.5rem auto",
+          fontSize: "1.1rem",
+          color: "#555",
+          lineHeight: "1.6",
+        }}
+      >
+        Struggling to find the perfect gift? Enter a few details and get
+        personalized, creative gift suggestions instantly. Perfect for
+        birthdays, holidays, or any special occasion! 🎁
+      </p>
       <form
         onSubmit={handleSubmit}
         style={{
@@ -141,8 +181,38 @@ export default function Home() {
             <strong>{idx + 1}.</strong> {idea}{" "}
           </div>
         ))}{" "}
-        {loading && ( <div style={{ textAlign: "center", padding: "1rem", fontStyle: "italic", color: "#555", }} > Generating ideas… </div> )}
+        {loading && (
+          <div
+            style={{
+              textAlign: "center",
+              padding: "1rem",
+              fontStyle: "italic",
+              color: "#555",
+            }}
+          >
+            {" "}
+            Generating ideas…{" "}
+          </div>
+        )}
       </div>
+      {ideas.length > 0 && (
+        <button
+          onClick={exportToPDF}
+          style={{
+            margin: "2rem auto 0",
+            display: "block",
+            padding: "0.75rem 1.5rem",
+            borderRadius: "8px",
+            border: "none",
+            backgroundColor: "#27ae60",
+            color: "white",
+            fontSize: "1rem",
+            cursor: "pointer",
+          }}
+        >
+          📄 Export as PDF
+        </button>
+      )}
     </div>
   );
 }
