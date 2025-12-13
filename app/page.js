@@ -54,6 +54,20 @@ export default function Home() {
     doc.save("surprisehub-gift-ideas.pdf");
   };
 
+  const [copiedIndex, setCopiedIndex] = useState(null);
+  const copyToClipboard = async (text, index) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedIndex(index);
+
+      setTimeout(() => {
+        setCopiedIndex(null);
+      }, 1500);
+    } catch (err) {
+      console.error("Copy failed", err);
+    }
+  };
+
   return (
     <div
       style={{
@@ -169,16 +183,36 @@ export default function Home() {
           <div
             key={idx}
             style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              gap: "1rem",
               padding: "1rem 1.5rem",
               borderRadius: "12px",
               backgroundColor: "white",
               boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
-              fontSize: "1.1rem",
-              color: "#2c3e50",
             }}
           >
             {" "}
             <strong>{idx + 1}.</strong> {idea}{" "}
+            <button
+              onClick={() => copyToClipboard(idea, idx)}
+              title="Kopieren"
+              style={{
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                fontSize: "1.2rem",
+                color: copiedIndex === idx ? "#2ecc71" : "#7f8c8d",
+                transition: "color 0.2s, transform 0.1s",
+              }}
+              onMouseDown={(e) =>
+                (e.currentTarget.style.transform = "scale(0.9)")
+              }
+              onMouseUp={(e) => (e.currentTarget.style.transform = "scale(1)")}
+            >
+              {copiedIndex === idx ? "✅" : "📋"}
+            </button>
           </div>
         ))}{" "}
         {loading && (
