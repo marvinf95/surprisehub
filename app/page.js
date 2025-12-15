@@ -69,6 +69,19 @@ export default function Home() {
   };
 
   const [email, setEmail] = useState("");
+  const [sending, setSending] = useState(false);
+  const [mailSent, setMailSent] = useState(false);
+  const iconButtonStyle = (bgColor) => ({
+    padding: "0.65rem 0.9rem",
+    borderRadius: "8px",
+    border: "none",
+    backgroundColor: bgColor,
+    color: "white",
+    fontSize: "1.1rem",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  });
 
   return (
     <div
@@ -236,63 +249,81 @@ export default function Home() {
           style={{
             marginTop: "2rem",
             display: "flex",
-            gap: "1rem",
+            gap: "2rem",
             justifyContent: "center",
             alignItems: "center",
             flexWrap: "wrap",
           }}
         >
-          <button
-            onClick={exportToPDF}
+          <div>
+            <button
+              onClick={exportToPDF}
+              title="Als PDF exportieren"
+              style={iconButtonStyle("#27ae60")}
+            >
+              Export PDF 📄
+            </button>
+          </div>
+          <div
             style={{
-              padding: "0.75rem 1.25rem",
-              borderRadius: "8px",
-              border: "none",
-              backgroundColor: "#27ae60",
-              color: "white",
-              fontSize: "1rem",
-              cursor: "pointer",
-              whiteSpace: "nowrap",
+              display: "flex",
+              gap: "0.5rem",
+              alignItems: "center",
             }}
           >
-            📄 Export PDF
-          </button>
-          <input
-            type="email"
-            placeholder="E-Mail-Adresse"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            style={{
-              padding: "0.75rem",
-              borderRadius: "8px",
-              border: "1px solid #ccc",
-              fontSize: "1rem",
-              minWidth: "220px",
-            }}
-          />
+            <input
+              type="email"
+              placeholder="E-Mail"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              style={{
+                padding: "0.65rem 0.75rem",
+                borderRadius: "8px",
+                border: "1px solid #ccc",
+                fontSize: "0.95rem",
+                minWidth: "200px",
+              }}
+            />
+            <button
+              onClick={async () => {
+                setSending(true);
+                setMailSent(false);
 
-          <button
-            onClick={async () => {
-              await fetch("/api/send-email", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email, ideas }),
-              });
-              alert("📧 E-Mail wurde versendet!");
-            }}
-            style={{
-              padding: "0.75rem 1.25rem",
-              borderRadius: "8px",
-              border: "none",
-              backgroundColor: "#2c3e50",
-              color: "white",
-              fontSize: "1rem",
-              cursor: "pointer",
-              whiteSpace: "nowrap",
-            }}
-          >
-            ✉️ Send Email
-          </button>
+                await fetch("/api/send-email", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ email, ideas }),
+                });
+
+                setSending(false);
+                setMailSent(true);
+
+                setTimeout(() => setMailSent(false), 2000);
+              }}
+              disabled={!email || sending}
+              title="Per E-Mail senden"
+              style={{
+                ...iconButtonStyle("#2c3e50"),
+                opacity: !email || sending ? 0.5 : 1,
+                cursor: !email || sending ? "not-allowed" : "pointer",
+              }}
+            >
+              {sending ? "⏳" : "Send Mail✉️"}
+            </button>
+          </div>
+          {mailSent && (
+            <div
+              style={{
+                width: "100%",
+                textAlign: "center",
+                marginTop: "0.5rem",
+                fontSize: "0.9rem",
+                color: "#27ae60",
+              }}
+            >
+              ✔ E-Mail wurde versendet
+            </div>
+          )}
         </div>
       )}
     </div>
