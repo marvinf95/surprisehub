@@ -4,6 +4,27 @@ import { useState } from "react";
 import jsPDF from "jspdf";
 
 export default function Home() {
+  const lightTheme = {
+    background: "linear-gradient(135deg, #fdf6e3, #e0f7fa)",
+    card: "#ffffff",
+    text: "#2c3e50",
+    inputBg: "#ffffff",
+    border: "#ccc",
+    button: "#2c3e50",
+  };
+
+  const darkTheme = {
+    background: "linear-gradient(135deg, #1e1e2f, #121212)",
+    card: "#1f2933",
+    text: "#ecf0f1",
+    inputBg: "#2c2c3a",
+    border: "#444",
+    button: "#3b82f6",
+  };
+
+  const [darkMode, setDarkMode] = useState(false);
+  const theme = darkMode ? darkTheme : lightTheme;
+
   const [form, setForm] = useState({
     age: "",
     relationship: "",
@@ -84,15 +105,31 @@ export default function Home() {
   });
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        padding: "2rem",
-        background: "linear-gradient(135deg, #fdf6e3, #e0f7fa)",
-        fontFamily: "Arial, sans-serif",
-      }}
-    >
+<div
+  style={{
+    minHeight: "100vh",
+    padding: "2rem",
+    background: theme.background,
+    color: theme.text,
+    transition: "all 0.3s ease",
+  }}
+>
       {" "}
+      <button
+  onClick={() => setDarkMode(!darkMode)}
+  style={{
+    position: "absolute",
+    top: "1.5rem",
+    right: "1.5rem",
+    background: "none",
+    border: "none",
+    fontSize: "1.5rem",
+    cursor: "pointer",
+    color: theme.text,
+  }}
+>
+  {darkMode ? "☀️" : "🌙"}
+</button>
       <img
         src="/surprisehub_logo.svg"
         alt="SurpriseHub Logo"
@@ -260,6 +297,7 @@ export default function Home() {
               onClick={exportToPDF}
               title="Als PDF exportieren"
               style={iconButtonStyle("#27ae60")}
+              
             >
               Export PDF 📄
             </button>
