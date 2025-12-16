@@ -8,9 +8,16 @@ const client = new OpenAI({
 });
 
 export async function POST(req) {
-  const { age, relationship, budget, interests, occasion } = await req.json();
+  const { age, relationship, budget, interests, occasion, lang } = await req.json();
+
+  const languageInstruction =
+    lang === "de"
+      ? "Antworten bitte auf Deutsch."
+      : "Please answer in English.";
 
   const prompt = `
+${languageInstruction}
+
 Give me exactly 5 creative gift ideas for a ${age}-year-old ${relationship},
 budget: ${budget}, interests: ${interests}, occasion: ${occasion}.
 Number them 1 to 5.
@@ -25,7 +32,7 @@ Output only the numbered list, one idea per line.
         {
           role: "system",
           content:
-            "Never output <think> or internal reasoning. Only output the final numbered list."
+            "Never output <think> or internal reasoning. Only output the final numbered list.",
         },
         { role: "user", content: prompt },
       ],
@@ -39,20 +46,21 @@ Output only the numbered list, one idea per line.
     // Remove any <think> blocks
     const cleanText = text.replace(/<think>[\s\S]*?<\/think>/gi, "");
 
-// Extract numbered lines
-const ideas = (cleanText.match(/^\s*\d+\.\s*(.+)$/gim) || []).map(line =>
-  line.replace(/^\d+\.\s*/, "").trim() // remove any leading "1.", "2.", etc.
-);
-const cleanIdeas = ideas.map(idea => idea.replace(/^\d+\.\s*/, ""));
+    // Extract numbered lines
+    const ideas = (cleanText.match(/^\s*\d+\.\s*(.+)$/gim) || []).map(
+      (line) => line.replace(/^\d+\.\s*/, "").trim() // remove any leading "1.", "2.", etc.
+    );
+    const cleanIdeas = ideas.map((idea) => idea.replace(/^\d+\.\s*/, ""));
 
-// Take only the first 5
-const firstFive = cleanIdeas.slice(0, 5);
+    // Take only the first 5
+    const firstFive = cleanIdeas.slice(0, 5);
 
     return new Response(JSON.stringify({ ideas: firstFive }), {
       headers: { "Content-Type": "application/json" },
     });
   } catch (err) {
-    return new Response(JSON.stringify({ error: err.message }), {
+    console.error("API ERROR /api/generate:", err);
+    return new Response(JSON.stringify({ error: String(err) }), {
       status: 500,
       headers: { "Content-Type": "application/json" },
     });
