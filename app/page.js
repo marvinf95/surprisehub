@@ -4,6 +4,39 @@ import { useState } from "react";
 import jsPDF from "jspdf";
 
 export default function Home() {
+  const locale =
+    typeof navigator !== "undefined" ? navigator.language : "en-US";
+
+  function getAmazonDomain() {
+    const lang = navigator.language;
+
+    if (lang.startsWith("de")) return "amazon.de";
+    if (lang.startsWith("en-GB")) return "amazon.co.uk";
+    if (lang.startsWith("fr")) return "amazon.fr";
+    if (lang.startsWith("it")) return "amazon.it";
+    if (lang.startsWith("es")) return "amazon.es";
+
+    return "amazon.com"; // fallback
+  }
+
+  function amazonAffiliateLink(idea) {
+    const domain = getAmazonDomain();
+    const query = encodeURIComponent(idea);
+
+    const tags = {
+      "amazon.de": "surprisehub01-21",
+      "amazon.com": "deinUStag-20", //TODO
+      "amazon.co.uk": "deinUKtag-21", //TODO
+      "amazon.fr": "deinFRtag-21", //TODO
+      "amazon.it": "deinITtag-21", //TODO
+      "amazon.es": "deinEStag-21", //TODO
+    };
+
+    const tag = tags[domain] || tags["amazon.com"];
+
+    return `https://www.${domain}/s?k=${query}&tag=${tag}`;
+  }
+
   const [form, setForm] = useState({
     age: "",
     relationship: "",
@@ -228,6 +261,24 @@ export default function Home() {
             >
               {copiedIndex === idx ? "✅" : "📋"}
             </button>
+            <a
+              href={amazonAffiliateLink(idea)}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                marginTop: "0.75rem",
+                display: "inline-block",
+                padding: "0.4rem 0.8rem",
+                borderRadius: "6px",
+                backgroundColor: "#ff9900",
+                color: "#111",
+                fontSize: "0.9rem",
+                textDecoration: "none",
+                fontWeight: "bold",
+              }}
+            >
+              🔍 Auf Amazon ansehen
+            </a>
           </div>
         ))}{" "}
         {loading && (
@@ -326,6 +377,9 @@ export default function Home() {
           )}
         </div>
       )}
+      <p style={{ fontSize: "0.75rem", opacity: 0.7 }}>
+        *Als Amazon-Partner verdiene ich an qualifizierten Verkäufen.*
+      </p>
     </div>
   );
 }

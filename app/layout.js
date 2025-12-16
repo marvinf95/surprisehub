@@ -1,6 +1,9 @@
 export const metadata = {
-  title: 'SurpriseHub 🎁',
+  title: 'SurpriseHub',
   description: 'Creative gift ideas generator',
+  icons: {
+    icon: "surprisehub_logo.svg",
+  },
 }
 
 export default function RootLayout({ children }) {
