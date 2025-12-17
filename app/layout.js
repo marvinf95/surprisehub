@@ -1,10 +1,12 @@
+import { SpeedInsights } from "@vercel/speed-insights/next";
+
 export const metadata = {
-  title: 'SurpriseHub',
-  description: 'Creative gift ideas generator',
+  title: "SurpriseHub",
+  description: "Creative gift ideas generator",
   icons: {
     icon: "surprisehub_logo.svg",
   },
-}
+};
 
 export default function RootLayout({ children }) {
   return (
@@ -23,7 +25,8 @@ export default function RootLayout({ children }) {
         }}
       >
         {children}
+        <SpeedInsights />
       </body>
     </html>
-  )
+  );
 }
