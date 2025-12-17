@@ -60,6 +60,7 @@ export default function Home({ initialLang = "en" }) {
   });
   const [ideas, setIdeas] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -77,10 +78,17 @@ export default function Home({ initialLang = "en" }) {
       });
 
       const data = await res.json();
-      console.log("Raw data from backend:", data);
+
+      // 🚦 Rate limit / Handle backend error
+      if (!res.ok) {
+        setError(data.error || "Something went wrong. Please try again.");
+        return;
+      }
+
       setIdeas(data.ideas || []);
     } catch (err) {
       console.error(err);
+      setError("Network error. Please try again later.");
     } finally {
       setLoading(false);
     }
@@ -227,9 +235,23 @@ export default function Home({ initialLang = "en" }) {
           }
         >
           {" "}
-          {t.generate}
-          {" "}
+          {t.generate}{" "}
         </button>
+        {error && (
+          <div
+            style={{
+              marginTop: "1rem",
+              padding: "0.75rem 1rem",
+              borderRadius: "8px",
+              backgroundColor: "#fdecea",
+              color: "#b71c1c",
+              textAlign: "center",
+              fontSize: "0.95rem",
+            }}
+          >
+            {error}
+          </div>
+        )}
       </form>
       <div
         style={{
@@ -390,9 +412,7 @@ export default function Home({ initialLang = "en" }) {
           )}
         </div>
       )}
-      <p style={{ fontSize: "0.75rem", opacity: 0.7 }}>
-        *{t.amazonAffiliate}*
-      </p>
+      <p style={{ fontSize: "0.75rem", opacity: 0.7 }}>*{t.amazonAffiliate}*</p>
     </div>
   );
 }

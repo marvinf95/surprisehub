@@ -1,4 +1,5 @@
 import OpenAI from "openai";
+import { ratelimit } from "@/lib/ratelimit";
 
 export const runtime = "edge"; // required for edge runtime
 
@@ -8,7 +9,32 @@ const client = new OpenAI({
 });
 
 export async function POST(req) {
-  const { age, relationship, budget, interests, occasion, lang } = await req.json();
+  const ip =
+    req.headers.get("x-forwarded-for") ??
+    req.headers.get("x-real-ip") ??
+    "127.0.0.1";
+
+  const { success, limit, remaining, reset } = await ratelimit.limit(ip);
+
+  if (!success) {
+    return new Response(
+      JSON.stringify({
+        error: "Too many requests. Please try again later.",
+      }),
+      {
+        status: 429,
+        headers: {
+          "Content-Type": "application/json",
+          "X-RateLimit-Limit": limit,
+          "X-RateLimit-Remaining": remaining,
+          "X-RateLimit-Reset": reset,
+        },
+      }
+    );
+  }
+  
+  const { age, relationship, budget, interests, occasion, lang } =
+    await req.json();
 
   const languageInstruction =
     lang === "de"

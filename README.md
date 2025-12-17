@@ -21,13 +21,18 @@ Provide age, relationship, budget, interests, and occasion, and receive personal
 - In resend you need to add the domain of the email.
 - In the configuration of your email you need to configure the SPF and DKIM entries
 
+3. Create Upstash Redis
+- Login to "[Upstash](https://console.upstash.com/)" and create a free redis database.
+
 ## Setup
 
-1. Create a `.env.local` file with your Groq API key and resend API key:
+1. Create a `.env.local` file with your Groq API key, resend API key and redis connection information:
 
 ```bash
 GROQ_API_KEY=YOUR_GROQ_API_KEY
 RESEND_API_KEY=YOUR_RESEND_API_KEY
+UPSTASH_REDIS_REST_URL=YOUR_UPSTASH_REDIS_REST_URL
+UPSTASH_REDIS_REST_TOKEN=YOUR_UPSTASH_REDIS_REST_TOKEN
 ```
 
 2. Install dependencies:
