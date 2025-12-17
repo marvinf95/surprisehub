@@ -1,5 +1,28 @@
 import OpenAI from "openai";
 import { ratelimit } from "@/lib/ratelimit";
+import { z } from "zod";
+
+const securityHeaders = {
+  "Content-Type": "application/json",
+  "X-Content-Type-Options": "nosniff",
+  "X-Frame-Options": "DENY",
+  "Referrer-Policy": "strict-origin-when-cross-origin",
+};
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "https://surprisehub.app",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type",
+};
+
+const generateSchema = z.object({
+  age: z.coerce.string().trim().min(1).max(3),
+  relationship: z.string().trim().min(1).max(50),
+  budget: z.coerce.string().trim().min(1).max(20),
+  interests: z.string().trim().min(1).max(200),
+  occasion: z.string().trim().min(1).max(50),
+  lang: z.string().trim().min(2).max(5).optional(),
+});
 
 export const runtime = "edge"; // required for edge runtime
 
@@ -7,6 +30,16 @@ const client = new OpenAI({
   apiKey: process.env.GROQ_API_KEY,
   baseURL: "https://api.groq.com/openai/v1",
 });
+
+export async function OPTIONS() {
+  return new Response(null, {
+    status: 204,
+    headers: {
+      ...securityHeaders,
+      ...corsHeaders,
+    },
+  });
+}
 
 export async function POST(req) {
   const ip =
@@ -24,7 +57,8 @@ export async function POST(req) {
       {
         status: 429,
         headers: {
-          "Content-Type": "application/json",
+          ...securityHeaders,
+          ...corsHeaders,
           "X-RateLimit-Limit": limit,
           "X-RateLimit-Remaining": remaining,
           "X-RateLimit-Reset": reset,
@@ -32,9 +66,24 @@ export async function POST(req) {
       }
     );
   }
-  
-  const { age, relationship, budget, interests, occasion, lang } =
-    await req.json();
+
+  const body = await req.json();
+
+  const parsed = generateSchema.safeParse(body);
+
+  if (!parsed.success) {
+    return new Response(
+      JSON.stringify({
+        error: "Invalid input. Please check your entries.",
+      }),
+      {
+        status: 400,
+        headers: { ...securityHeaders, ...corsHeaders },
+      }
+    );
+  }
+
+  const { age, relationship, budget, interests, occasion, lang } = parsed.data;
 
   const languageInstruction =
     lang === "de"
@@ -82,13 +131,13 @@ Output only the numbered list, one idea per line.
     const firstFive = cleanIdeas.slice(0, 5);
 
     return new Response(JSON.stringify({ ideas: firstFive }), {
-      headers: { "Content-Type": "application/json" },
+      headers: { ...securityHeaders, ...corsHeaders },
     });
   } catch (err) {
     console.error("API ERROR /api/generate:", err);
     return new Response(JSON.stringify({ error: String(err) }), {
       status: 500,
-      headers: { "Content-Type": "application/json" },
+      headers: { ...securityHeaders, ...corsHeaders },
     });
   }
 }

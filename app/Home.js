@@ -51,13 +51,22 @@ export default function Home({ initialLang = "en" }) {
     return `https://www.${domain}/s?k=${query}&tag=${tag}`;
   }
 
+  const fieldConfig = [
+    { name: "age", labelKey: "age" },
+    { name: "relationship", labelKey: "relationship" },
+    { name: "budget", labelKey: "budget" },
+    { name: "interests", labelKey: "interests" },
+    { name: "occasion", labelKey: "occasion" },
+  ];
+
   const [form, setForm] = useState({
-    [t.fields.age]: "",
-    [t.fields.relationship]: "",
-    [t.fields.budget]: "",
-    [t.fields.interests]: "",
-    [t.fields.occasion]: "",
+    age: "",
+    relationship: "",
+    budget: "",
+    interests: "",
+    occasion: "",
   });
+
   const [ideas, setIdeas] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -71,9 +80,13 @@ export default function Home({ initialLang = "en" }) {
     setLoading(true);
 
     try {
+      const cleanedForm = Object.fromEntries(
+        Object.entries(form).map(([k, v]) => [k, v.trim()])
+      );
+
       const res = await fetch("/api/generate", {
         method: "POST",
-        body: JSON.stringify({ ...form, lang }),
+        body: JSON.stringify({ ...cleanedForm, lang }),
         headers: { "Content-Type": "application/json" },
       });
 
@@ -189,8 +202,11 @@ export default function Home({ initialLang = "en" }) {
           gap: "1rem",
         }}
       >
-        {Object.keys(form).map((key) => (
-          <div key={key} style={{ display: "flex", flexDirection: "column" }}>
+        {fieldConfig.map((field) => (
+          <div
+            key={field.name}
+            style={{ display: "flex", flexDirection: "column" }}
+          >
             <label
               style={{
                 marginBottom: "0.3rem",
@@ -198,13 +214,12 @@ export default function Home({ initialLang = "en" }) {
                 color: "#34495e",
               }}
             >
-              {key.charAt(0).toUpperCase() + key.slice(1)}
-            </label>{" "}
+              {t.fields[field.labelKey]}
+            </label>
             <input
-              key={key}
-              name={key}
-              placeholder={key.charAt(0).toUpperCase() + key.slice(1)}
-              value={form[key]}
+              name={field.name}
+              placeholder={t.fields[field.labelKey]}
+              value={form[field.name]}
               onChange={handleChange}
               style={{
                 padding: "0.75rem 1rem",

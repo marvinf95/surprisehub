@@ -6,6 +6,13 @@ export async function POST(req) {
   try {
     const { email, ideas } = await req.json();
 
+    if (!email || !email.includes("@")) {
+      return new Response(
+        JSON.stringify({ error: "Invalid email address" }),
+        { status: 400 }
+      );
+    }
+    
     if (!email || !ideas?.length) {
       return new Response(
         JSON.stringify({ error: "Missing email or ideas" }),
