@@ -1,4 +1,5 @@
-# SurpriseHub 🎁
+![SurpriseHub Logo](public/surprisehub_logo.svg)
+# SurpriseHub
 
 Struggling to find the perfect gift? Enter a few details and get personalized, creative gift suggestions instantly. Perfect for birthdays, holidays, or any special occasion! 🎁
 
@@ -22,7 +23,14 @@ Provide age, relationship, budget, interests, and occasion, and receive personal
 - In the configuration of your email you need to configure the SPF and DKIM entries
 
 3. Create Upstash Redis
+
 - Login to "[Upstash](https://console.upstash.com/)" and create a free redis database.
+
+4. Vercel
+
+- Create Account in Vercel
+- Connect Git Repository in Vercel
+- Add domain
 
 ## Setup
 
