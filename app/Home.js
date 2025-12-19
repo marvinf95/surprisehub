@@ -218,7 +218,7 @@ export default function Home({ initialLang = "en" }) {
             </label>
             <input
               name={field.name}
-              placeholder={t.fields[field.labelKey]}
+              placeholder={t.placeholders?.[field.labelKey]}
               value={form[field.name]}
               onChange={handleChange}
               style={{
