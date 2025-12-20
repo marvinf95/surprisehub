@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import jsPDF from "jspdf";
 import { translations } from "@/lib/i18n";
 import { amazonAffiliateLink } from "@/lib/affiliateLinks";
