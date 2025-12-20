@@ -3,9 +3,11 @@
 import { useState, useEffect } from "react";
 import jsPDF from "jspdf";
 import { translations } from "@/lib/i18n";
+import { amazonAffiliateLink } from "@/lib/affiliateLinks";
 
 export default function Home({ initialLang = "en" }) {
   const [lang, setLang] = useState(initialLang || "en");
+  const availableLangs = Object.keys(translations);
 
   // Optional: beim ersten Client-Render Sprache an Browserpräferenz angleichen
   useEffect(() => {
@@ -19,37 +21,6 @@ export default function Home({ initialLang = "en" }) {
 
   const locale =
     typeof navigator !== "undefined" ? navigator.language : "en-US";
-
-  function getAmazonDomain() {
-    const lang = navigator.language;
-
-    if (lang.startsWith("de")) return "amazon.de";
-    if (lang.startsWith("en-GB")) return "amazon.co.uk";
-    if (lang.startsWith("us")) return "amazon.com";
-    if (lang.startsWith("fr")) return "amazon.fr";
-    if (lang.startsWith("it")) return "amazon.it";
-    if (lang.startsWith("es")) return "amazon.es";
-
-    return "amazon.com"; // fallback
-  }
-
-  function amazonAffiliateLink(idea) {
-    const domain = getAmazonDomain();
-    const query = encodeURIComponent(idea.toLowerCase().replace(/["']/g, ""));
-
-    const tags = {
-      "amazon.de": "surprisehub01-21",
-      "amazon.com": "surprisehub0c-20",
-      "amazon.co.uk": "surprisehub0d-21",
-      "amazon.fr": "surprisehub09-21",
-      "amazon.it": "surprisehub0f-21",
-      "amazon.es": "surprisehub04-21",
-    };
-
-    const tag = tags[domain] || tags["amazon.com"];
-
-    return `https://www.${domain}/s?k=${query}&tag=${tag}`;
-  }
 
   const fieldConfig = [
     { name: "age", labelKey: "age" },
@@ -160,7 +131,37 @@ export default function Home({ initialLang = "en" }) {
         fontFamily: "Arial, sans-serif",
       }}
     >
-      {" "}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          alignItems: "center",
+          marginBottom: "0.5rem",
+        }}
+      >
+        <select
+          value={lang}
+          onChange={(e) => {
+            const newLang = e.target.value;
+            setLang(newLang);
+            document.cookie = `lang=${newLang};path=/;SameSite=Lax`;
+          }}
+          style={{
+            padding: "0.25rem 0.5rem",
+            borderRadius: "6px",
+            border: "1px solid #ccc",
+            fontSize: "0.85rem",
+            backgroundColor: "#fff",
+            cursor: "pointer",
+          }}
+        >
+          {availableLangs.map((code) => (
+            <option key={code} value={code}>
+              {code.toUpperCase()}
+            </option>
+          ))}
+        </select>
+      </div>{" "}
       <img
         src="/surprisehub_logo.svg"
         alt="SurpriseHub Logo"
