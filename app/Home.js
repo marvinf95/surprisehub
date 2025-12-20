@@ -35,7 +35,7 @@ export default function Home({ initialLang = "en" }) {
 
   function amazonAffiliateLink(idea) {
     const domain = getAmazonDomain();
-    const query = encodeURIComponent(idea);
+    const query = encodeURIComponent(idea.toLowerCase().replace(/["']/g, ""));
 
     const tags = {
       "amazon.de": "surprisehub01-21",
