@@ -35,6 +35,7 @@ jobs:
       run: |
         npm run dev &
         npx wait-on http://localhost:3000
+        npx playwright install --with-deps
         npx playwright test
     
     - name: Upload Test Coverage
