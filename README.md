@@ -1,38 +1,64 @@
-![SurpriseHub Logo](public/surprisehub_logo.svg)
-# SurpriseHub
+<div align="center">
+  <img src="public/surprisehub_logo.svg" width="15%" alt="SurpriseHub Banner">
+  
+  [![Vercel](https://thereadme.fun/api/embed?url=https://vercel.com/marvins-projects-714cd70a/surprisehub)](https://vercel.com/marvins-projects-714cd70a/surprisehub)
+  [![Tests](https://github.com/marvinf95/surprisehub/actions/workflows/ci.yml/badge.svg)](https://github.com/marvinf95/surprisehub/actions)
+  
+  <br>
+  
+  🎁 **AI-powered gift suggestions** in seconds! Enter age, interests, budget → Get personalized ideas instantly.
+  
+  <br>
+  
+  <img src="https://img.shields.io/badge/Next.js-14-black?style=flat&logo=next.js&logoColor=white" />
+  <img src="https://img.shields.io/badge/Vitest-95%25-blue?style=flat&logo=vitest&logoColor=white" />
+  <img src="https://img.shields.io/badge/Playwright-E2E-green?style=flat&logo=playwright&logoColor=white" />
+  
+</div>
+<br>
+
+## Description
 
 Struggling to find the perfect gift? Enter a few details and get personalized, creative gift suggestions instantly. Perfect for birthdays, holidays, or any special occasion! 🎁
 
 SurpriseHub is an AI-powered gift idea generator.  
 Provide age, relationship, budget, interests, and occasion, and receive personalized, creative gift ideas in seconds.
 
-## Development
+### Architecture
 
-- Next.js 13 frontend using React client components
+- Next.js frontend using React client components
 - Groq OpenAI API for generating gift ideas
 - Modern, card-based UI with gradient background
-- PDF export of results (optional) -> Future Feature
+- Export as PDF or send ideas to an email address
+- Get direct links for each idea to amazon
 
-## Prerequisites
+## Development
 
-1. Create E-Mail
+### Prerequisites
 
-2. In my case i use resend to send emails from the app through the generated mail address to the users.
+1. Groq as AI model
 
-- In resend you need to add the domain of the email.
-- In the configuration of your email you need to configure the SPF and DKIM entries
+   - Create a account at [Groq](https://console.groq.com/) and generate an api key.
 
-3. Create Upstash Redis
+2. Create E-Mail
 
-- Login to "[Upstash](https://console.upstash.com/)" and create a free redis database.
+3. [Resend](https://resend.com/) for sending mails
+   In my case i use resend to send emails from the app through the generated mail address to the users.
 
-4. Vercel
+   - In resend you need to add the domain of the email.
+   - In the configuration of your email you need to configure the SPF and DKIM entries.
 
-- Create Account in Vercel
-- Connect Git Repository in Vercel
-- Add domain
+4. Create Upstash Redis
 
-## Setup
+   - Login to [Upstash](https://console.upstash.com/) and create a free redis database.
+
+5. Vercel
+
+   - Create Account in [Vercel](https://vercel.com/)
+   - Connect Git Repository in Vercel
+   - Add domain
+
+### Setup
 
 1. Create a `.env.local` file with your Groq API key, resend API key and redis connection information:
 
@@ -57,25 +83,48 @@ npm run dev
 
 4. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-## Structure
+### Structure
 
-- `/app/page.js` → Frontend UI
+- `/app/page.js` → Route
+- `/app/Home.jsx` → Frontend UI + client
 - `/app/api/generate/route.js` → Backend API route for generating gift ideas
+- `/app/api/send-email/route.js` → Backend API route for sending emails with a list of generated gifts
 
 ## Test
 
-1. Test LLM
+### Unit and coverage tests
+
+Vitest is used for the unit and coverage tests.
+
+```bash
+npm test
+npm run test:coverage
+npm run test:unit
+npm run test:api
+```
+
+### E2E tests
+
+Playwright is used for the e2e browser tests.
+
+```bash
+npm run test:e2e
+```
+
+### Functions to test while developing
+
+1. Small test to test the output of the LLM
    With the following script you can test if the llm and the apikey is working.
 
 ```bash
-cd surprisehub/test/
+cd test/
 node test-llm.mjs
 ```
 
-2. Test backend
+2. Small script to test the output of the backend
    The following script tries to call the backend and shows the result of the backend without need of the frontend.
 
 ```bash
-cd surprisehub/test/
+cd test/
 node test-backend.mjs
 ```

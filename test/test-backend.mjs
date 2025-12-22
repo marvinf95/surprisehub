@@ -1,4 +1,3 @@
-import fetch from "node-fetch"; // or just 'fetch' in Node 18+
 import dotenv from "dotenv";
 
 dotenv.config({ path: "../.env.local" });
