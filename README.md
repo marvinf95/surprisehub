@@ -1,7 +1,7 @@
 <div align="center">
   <img src="public/surprisehub_logo.svg" width="15%" alt="SurpriseHub Banner">
   
-  [![Vercel](https://thereadme.fun/api/embed?url=https://vercel.com/marvins-projects-714cd70a/surprisehub)](https://vercel.com/marvins-projects-714cd70a/surprisehub)
+  [![Vercel](https://thereadme.fun/api/embed?url=https://surprisehub.app/)](https://surprisehub.app/)
   [![Tests](https://github.com/marvinf95/surprisehub/actions/workflows/ci.yml/badge.svg)](https://github.com/marvinf95/surprisehub/actions)
   
   <br>
