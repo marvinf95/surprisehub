@@ -1,21 +1,16 @@
 <div align="center">
   <img src="public/surprisehub_logo.svg" width="15%" alt="SurpriseHub Banner">
 
+  # SurpriseHub
+
   [![Vercel Deployed](https://img.shields.io/badge/Vercel-Deployed-brightblack?style=flat&logo=vercel&logoColor=white)](https://surprisehub.app/)
   [![Tests](https://github.com/marvinf95/surprisehub/actions/workflows/ci.yml/badge.svg)](https://github.com/marvinf95/surprisehub/actions)
-  
-  <br>
-  
-  🎁 **AI-powered gift suggestions** in seconds! Enter age, interests, budget → Get personalized ideas instantly.
-  
-  <br>
-  
   <img src="https://img.shields.io/badge/Next.js-14-black?style=flat&logo=next.js&logoColor=white" />
   <img src="https://img.shields.io/badge/Vitest-95%25-blue?style=flat&logo=vitest&logoColor=white" />
   <img src="https://img.shields.io/badge/Playwright-E2E-green?style=flat&logo=playwright&logoColor=white" />
   
+  🎁 **AI-powered gift suggestions** in seconds! Enter age, interests, budget → Get personalized ideas instantly.
 </div>
-<br>
 
 ## Description
 
