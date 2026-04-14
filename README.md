@@ -9,117 +9,124 @@
   <img src="https://img.shields.io/badge/Vitest-95%25-blue?style=flat&logo=vitest&logoColor=white" />
   <img src="https://img.shields.io/badge/Playwright-E2E-green?style=flat&logo=playwright&logoColor=white" />
   
-  🎁 **AI-powered gift suggestions** in seconds! Enter age, interests, budget → Get personalized ideas instantly.
+  **AI-powered gift suggestions** in seconds! Enter age, interests, budget → Get personalized ideas instantly.
 </div>
 
 ## Description
 
-Struggling to find the perfect gift? Enter a few details and get personalized, creative gift suggestions instantly. Perfect for birthdays, holidays, or any special occasion! 🎁
+Struggling to find the perfect gift? Enter a few details and get personalized, creative gift suggestions instantly. Perfect for birthdays, holidays, or any special occasion!
 
 SurpriseHub is an AI-powered gift idea generator.  
 Provide age, relationship, budget, interests, and occasion, and receive personalized, creative gift ideas in seconds.
 
+### Features
+
+- AI-generated gift suggestions tailored to the recipient
+- Customizable filters: age, relationship, budget, interests, occasion
+- Affiliate product links for easy shopping
+- Export ideas as PDF
+- Send gift ideas via email
+- Copy individual ideas to clipboard
+
 ### Architecture
 
-- Next.js frontend using React client components
-- Groq OpenAI API for generating gift ideas
-- Modern, card-based UI with gradient background
-- Export as PDF or send ideas to an email address
-- Get direct links for each idea to amazon
+- **Frontend**: Next.js 14 with React client components
+- **AI**: Groq (OpenAI-compatible API) for generating gift ideas
+- **Database**: Upstash Redis for caching and rate limiting
+- **Email**: Resend for transactional emails
+- **Deployment**: Vercel
 
-## Development
+## Getting Started
 
 ### Prerequisites
 
-1. Groq as AI model
-
-   - Create a account at [Groq](https://console.groq.com/) and generate an api key.
-
-2. Create E-Mail
-
-3. [Resend](https://resend.com/) for sending mails
-   In my case i use resend to send emails from the app through the generated mail address to the users.
-
-   - In resend you need to add the domain of the email.
-   - In the configuration of your email you need to configure the SPF and DKIM entries.
-
-4. Create Upstash Redis
-
-   - Login to [Upstash](https://console.upstash.com/) and create a free redis database.
-
-5. Vercel
-
-   - Create Account in [Vercel](https://vercel.com/)
-   - Connect Git Repository in Vercel
-   - Add domain
+1. **Groq API** - Create an account at [Groq Console](https://console.groq.com/) and generate an API key
+2. **Resend** - Sign up at [Resend](https://resend.com/) for email sending. Configure your domain and add SPF/DKIM entries
+3. **Upstash Redis** - Create a free Redis database at [Upstash Console](https://console.upstash.com/)
+4. **Vercel** - Connect your Git repository and add your domain
 
 ### Setup
 
-1. Create a `.env.local` file with your Groq API key, resend API key and redis connection information:
-
+1. Clone the repository:
 ```bash
-GROQ_API_KEY=YOUR_GROQ_API_KEY
-RESEND_API_KEY=YOUR_RESEND_API_KEY
-UPSTASH_REDIS_REST_URL=YOUR_UPSTASH_REDIS_REST_URL
-UPSTASH_REDIS_REST_TOKEN=YOUR_UPSTASH_REDIS_REST_TOKEN
+git clone https://github.com/marvinf95/surprisehub.git
+cd surprisehub
 ```
 
-2. Install dependencies:
+2. Create a `.env.local` file:
+```bash
+GROQ_API_KEY=your_groq_api_key
+RESEND_API_KEY=your_resend_api_key
+UPSTASH_REDIS_REST_URL=your_redis_rest_url
+UPSTASH_REDIS_REST_TOKEN=your_redis_rest_token
+```
 
+3. Install dependencies:
 ```bash
 npm install
 ```
 
-3. Run the development server:
-
+4. Run the development server:
 ```bash
 npm run dev
 ```
 
-4. Open [http://localhost:3000](http://localhost:3000) in your browser.
+5. Open [http://localhost:3000](http://localhost:3000)
 
-### Structure
+### Project Structure
 
-- `/app/page.js` → Route
-- `/app/Home.jsx` → Frontend UI + client
-- `/app/api/generate/route.js` → Backend API route for generating gift ideas
-- `/app/api/send-email/route.js` → Backend API route for sending emails with a list of generated gifts
-
-## Test
-
-### Unit and coverage tests
-
-Vitest is used for the unit and coverage tests.
-
-```bash
-npm test
-npm run test:coverage
-npm run test:unit
-npm run test:api
+```
+/app
+├── page.js              # Route handler
+├── Home.jsx             # Main UI component (client)
+├── layout.js            # Root layout
+├── globals.css          # Global styles
+└── api
+    ├── generate/
+    │   └── route.js     # Gift idea generation endpoint
+    └── send-email/
+        └── route.js     # Email sending endpoint
 ```
 
-### E2E tests
+## Testing
 
-Playwright is used for the e2e browser tests.
+### Unit & Coverage Tests (Vitest)
+```bash
+npm test              # Run all tests
+npm run test:coverage # Generate coverage report
+npm run test:unit     # Unit tests only
+npm run test:api      # API route tests
+```
 
+### E2E Tests (Playwright)
 ```bash
 npm run test:e2e
 ```
 
-### Functions to test while developing
-
-1. Small test to test the output of the LLM
-   With the following script you can test if the llm and the apikey is working.
-
+### Manual Testing Scripts
 ```bash
-cd test/
-node test-llm.mjs
+# Test LLM connection
+cd test && node test-llm.mjs
+
+# Test backend API directly
+cd test && node test-backend.mjs
 ```
 
-2. Small script to test the output of the backend
-   The following script tries to call the backend and shows the result of the backend without need of the frontend.
+## Monetization
 
-```bash
-cd test/
-node test-backend.mjs
-```
+SurpriseHub uses affiliate links to generate revenue:
+- Amazon Associates Partner Program
+- Etsy Affiliate Program
+- Radbag.de and other gift retailers
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+MIT License - see LICENSE file for details.
