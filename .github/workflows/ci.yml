@@ -67,4 +67,9 @@ jobs:
       run: npm run build
 
     - name: Deploy to Vercel
-      run: npx vercel@latest --prod --yes --token ${{ secrets.VERCEL_TOKEN }} --scope ${{ secrets.ORG_ID }} --project-name ${{ secrets.PROJECT_ID }}
+      uses: vercel/action@v0.1.0
+      with:
+        vercel-token: ${{ secrets.VERCEL_TOKEN }}
+        vercel-org-id: ${{ secrets.ORG_ID }}
+        vercel-project-id: ${{ secrets.PROJECT_ID }}
+        prod: true
