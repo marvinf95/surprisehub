@@ -66,9 +66,11 @@ jobs:
     - name: Build
       run: npm run build
 
-    - name: Deploy to Vercel
-      uses: amondnet/vercel-action@v25
-      with:
-        vercel-token: ${{ secrets.VERCEL_TOKEN }}
-        vercel-org-id: ${{ secrets.ORG_ID }}
-        vercel-project-id: ${{ secrets.PROJECT_ID }}
+    - name: Link to Vercel
+      run: npx vercel@latest link --token ${{ secrets.VERCEL_TOKEN }} --yes
+      env:
+        VERCEL_ORG_ID: ${{ secrets.ORG_ID }}
+        VERCEL_PROJECT_ID: ${{ secrets.PROJECT_ID }}
+
+    - name: Deploy
+      run: npx vercel@latest deploy --prod --yes --token ${{ secrets.VERCEL_TOKEN }}
