@@ -1,18 +1,18 @@
 import Home from "./Home.jsx"; 
 import { cookies, headers } from "next/headers";
 
-function detectLocale() {
-  const cookieStore = cookies();
+async function detectLocale() {
+  const cookieStore = await cookies();
   const cookieLocale = cookieStore.get("lang")?.value;
 
   if (cookieLocale === "de" || cookieLocale === "en") return cookieLocale;
 
-  const acceptLang = headers().get("accept-language") || "";
+  const acceptLang = (await headers()).get("accept-language") || "";
   if (acceptLang.startsWith("de")) return "de";
   return "en";
 }
 
-export default function Page() {
-  const lang = detectLocale();
+export default async function Page() {
+  const lang = await detectLocale();
   return <Home initialLang={lang} />;
 }
