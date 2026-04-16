@@ -2,6 +2,16 @@ import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+function escapeHtml(str) {
+  if (typeof str !== "string") return "";
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
 export async function POST(req) {
   try {
     const { email, ideas } = await req.json();
@@ -13,15 +23,26 @@ export async function POST(req) {
       );
     }
     
-    if (!email || !ideas?.length) {
+    if (!ideas?.length) {
       return new Response(
-        JSON.stringify({ error: "Missing email or ideas" }),
+        JSON.stringify({ error: "Missing ideas" }),
         { status: 400 }
       );
     }
 
-    const htmlIdeas = ideas
-      .map((idea, i) => `<li>${idea}</li>`)
+    const sanitizedIdeas = ideas
+      .filter((idea) => typeof idea === "string" && idea.trim().length > 0 && idea.length <= 500)
+      .slice(0, 20);
+
+    if (sanitizedIdeas.length === 0) {
+      return new Response(
+        JSON.stringify({ error: "No valid ideas provided" }),
+        { status: 400 }
+      );
+    }
+
+    const htmlIdeas = sanitizedIdeas
+      .map((idea) => `<li>${escapeHtml(idea)}</li>`)
       .join("");
 
     await resend.emails.send({
