@@ -12,17 +12,33 @@ function escapeHtml(str) {
     .replace(/'/g, "&#039;");
 }
 
-export async function POST(req) {
-  try {
-    const { email, ideas } = await req.json();
+function isValidEmail(email) {
+  if (typeof email !== "string") return false;
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
 
-    if (!email || !email.includes("@")) {
+export async function POST(req) {
+  let body;
+  try {
+    body = await req.json();
+  } catch {
+    return new Response(
+      JSON.stringify({ error: "Invalid JSON body" }),
+      { status: 400 }
+    );
+  }
+
+  try {
+    const { email, ideas } = body || {};
+
+    if (!isValidEmail(email)) {
       return new Response(
-        JSON.stringify({ error: "Invalid email address" }),
+        JSON.stringify({ error: "Valid email address required" }),
         { status: 400 }
       );
     }
-    
+
     if (!ideas?.length) {
       return new Response(
         JSON.stringify({ error: "Missing ideas" }),
@@ -63,8 +79,9 @@ export async function POST(req) {
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
+    console.error("Email send error:", error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: "Failed to send email" }),
       { status: 500 }
     );
   }
