@@ -2,10 +2,10 @@
 import { test, expect, vi } from 'vitest';
 import { POST } from './route';
 
-// Mocks VOR Import (bleibt gleich ✅)
-vi.mock('openai', () => ({
-  default: vi.fn().mockImplementation(() => ({
-    chat: {
+// Mocks VOR Import - Using a function that can be used with 'new'
+vi.mock('openai', () => {
+  const OpenAIMock = function() {
+    this.chat = {
       completions: {
         create: vi.fn().mockResolvedValue({
           choices: [{
@@ -13,9 +13,12 @@ vi.mock('openai', () => ({
           }]
         })
       }
-    }
-  }))
-}));
+    };
+  };
+  Object.defineProperty(OpenAIMock, 'name', { value: 'OpenAI' });
+  
+  return { default: OpenAIMock };
+});
 
 vi.mock("@/lib/ratelimit", () => ({
   ratelimit: {
