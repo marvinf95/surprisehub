@@ -2,6 +2,33 @@ import OpenAI from "openai";
 import { ratelimit } from "@/lib/ratelimit";
 import { z } from "zod";
 
+/** @type {import('openai').OpenAI} */
+const client = new OpenAI({
+  apiKey: process.env.GROQ_API_KEY,
+  baseURL: "https://api.groq.com/openai/v1",
+});
+
+/** @typedef {Object} GenerateInput
+ * @property {string} age
+ * @property {string} relationship
+ * @property {string} budget
+ * @property {string} interests
+ * @property {string} occasion
+ * @property {string} [lang]
+ */
+
+/** @type {import('zod').ZodSchema<GenerateInput>} */
+const generateSchema = z.object({
+  age: z.coerce.string().trim().min(1).max(3),
+  relationship: z.string().trim().min(1).max(50),
+  budget: z.coerce.string().trim().min(1).max(20),
+  interests: z.string().trim().min(1).max(200),
+  occasion: z.string().trim().min(1).max(50),
+  lang: z.string().trim().min(2).max(5).optional(),
+});
+
+export const runtime = "edge";
+
 const securityHeaders = {
   "Content-Type": "application/json",
   "X-Content-Type-Options": "nosniff",
@@ -14,22 +41,6 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type",
 };
-
-const generateSchema = z.object({
-  age: z.coerce.string().trim().min(1).max(3),
-  relationship: z.string().trim().min(1).max(50),
-  budget: z.coerce.string().trim().min(1).max(20),
-  interests: z.string().trim().min(1).max(200),
-  occasion: z.string().trim().min(1).max(50),
-  lang: z.string().trim().min(2).max(5).optional(),
-});
-
-export const runtime = "edge"; // required for edge runtime
-
-const client = new OpenAI({
-  apiKey: process.env.GROQ_API_KEY,
-  baseURL: "https://api.groq.com/openai/v1",
-});
 
 export async function OPTIONS() {
   return new Response(null, {

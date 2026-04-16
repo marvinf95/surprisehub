@@ -1,10 +1,16 @@
 import { Resend } from "resend";
 
+/** @type {import('resend').Resend} */
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+/**
+ * Escape HTML special characters to prevent XSS
+ * @param {unknown} str
+ * @returns {string}
+ */
 function escapeHtml(str) {
   if (typeof str !== "string") return "";
-  return str
+  return String(str)
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
@@ -12,6 +18,11 @@ function escapeHtml(str) {
     .replace(/'/g, "&#039;");
 }
 
+/**
+ * Validate email address format
+ * @param {unknown} email
+ * @returns {boolean}
+ */
 function isValidEmail(email) {
   if (typeof email !== "string") return false;
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
