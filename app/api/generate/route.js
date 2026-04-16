@@ -2,6 +2,33 @@ import OpenAI from "openai";
 import { ratelimit } from "@/lib/ratelimit";
 import { z } from "zod";
 
+/** @type {import('openai').OpenAI} */
+const client = new OpenAI({
+  apiKey: process.env.GROQ_API_KEY,
+  baseURL: "https://api.groq.com/openai/v1",
+});
+
+/** @typedef {Object} GenerateInput
+ * @property {string} age
+ * @property {string} relationship
+ * @property {string} budget
+ * @property {string} interests
+ * @property {string} occasion
+ * @property {string} [lang]
+ */
+
+/** @type {import('zod').ZodSchema<GenerateInput>} */
+const generateSchema = z.object({
+  age: z.coerce.string().trim().min(1).max(3),
+  relationship: z.string().trim().min(1).max(50),
+  budget: z.coerce.string().trim().min(1).max(20),
+  interests: z.string().trim().min(1).max(200),
+  occasion: z.string().trim().min(1).max(50),
+  lang: z.string().trim().min(2).max(5).optional(),
+});
+
+export const runtime = "edge";
+
 const securityHeaders = {
   "Content-Type": "application/json",
   "X-Content-Type-Options": "nosniff",
@@ -15,22 +42,6 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "Content-Type",
 };
 
-const generateSchema = z.object({
-  age: z.coerce.string().trim().min(1).max(3),
-  relationship: z.string().trim().min(1).max(50),
-  budget: z.coerce.string().trim().min(1).max(20),
-  interests: z.string().trim().min(1).max(200),
-  occasion: z.string().trim().min(1).max(50),
-  lang: z.string().trim().min(2).max(5).optional(),
-});
-
-export const runtime = "edge"; // required for edge runtime
-
-const client = new OpenAI({
-  apiKey: process.env.GROQ_API_KEY,
-  baseURL: "https://api.groq.com/openai/v1",
-});
-
 export async function OPTIONS() {
   return new Response(null, {
     status: 204,
@@ -41,13 +52,32 @@ export async function OPTIONS() {
   });
 }
 
-export async function POST(req) {
-  const ip =
-    req.headers.get("x-forwarded-for") ??
-    req.headers.get("x-real-ip") ??
-    "127.0.0.1";
+function getClientIp(req) {
+  const forwarded = req.headers.get("x-forwarded-for");
+  if (forwarded) {
+    const ips = forwarded.split(",").map((ip) => ip.trim());
+    const validIp = ips.find((ip) => /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(ip));
+    if (validIp) return validIp;
+  }
+  const realIp = req.headers.get("x-real-ip");
+  if (realIp && /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(realIp)) {
+    return realIp;
+  }
+  return "127.0.0.1";
+}
 
-  const { success, limit, remaining, reset } = await ratelimit.limit(ip);
+export async function POST(req) {
+  const ip = getClientIp(req);
+
+  let ratelimitResult;
+  try {
+    ratelimitResult = await ratelimit.limit(ip);
+  } catch (err) {
+    console.error("Ratelimit error:", err);
+    ratelimitResult = { success: true, limit: 5, remaining: 5, reset: 0 };
+  }
+
+  const { success, limit, remaining, reset } = ratelimitResult;
 
   if (!success) {
     return new Response(
@@ -135,7 +165,7 @@ Output only the numbered list, one idea per line.
     });
   } catch (err) {
     console.error("API ERROR /api/generate:", err);
-    return new Response(JSON.stringify({ error: String(err) }), {
+    return new Response(JSON.stringify({ error: "Failed to generate ideas" }), {
       status: 500,
       headers: { ...securityHeaders, ...corsHeaders },
     });
