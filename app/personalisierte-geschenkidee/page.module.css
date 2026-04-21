@@ -1,0 +1,12 @@
+.article { display: grid; gap: 2rem; }
+.hero h1 { font-size: 2.5rem; color: #1f2937; margin-bottom: 1rem; }
+.intro { font-size: 1.25rem; color: #4b5563; line-height: 1.7; }
+.content h2 { font-size: 1.75rem; color: #7c3aed; margin: 2rem 0 1rem; }
+.content p { margin-bottom: 1rem; color: #374151; }
+.content ul { list-style: none; padding: 0; }
+.content li { padding: 0.75rem 0; border-bottom: 1px solid #e5e7eb; }
+.cta { margin: 2rem 0; text-align: center; }
+.ctaButton { display: inline-block; background: #7c3aed; color: white; padding: 1rem 2rem; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 1.1rem; }
+.sidebar { margin-top: 2rem; }
+.sidebarCard { background: #f3e8ff; padding: 1.5rem; border-radius: 12px; }
+@media (max-width: 768px) { .hero h1 { font-size: 1.75rem; } }
