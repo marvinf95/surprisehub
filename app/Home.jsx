@@ -14,7 +14,7 @@ export default function Home({ initialLang = "en" }) {
     if (typeof navigator === "undefined") return;
     const browserLang = navigator.language.startsWith("de") ? "de" : "en";
     setLang(browserLang);
-    document.cookie = `lang=${browserLang};path=/;SameSite=Lax`;
+    document.cookie = `lang=${browserLang};path=/;SameSite=Strict;Secure`;
   }, []);
 
   const t = translations[lang];
