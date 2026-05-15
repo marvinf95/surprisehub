@@ -1,6 +1,13 @@
 import SEOPage from '../../../components/seo/SEOPage';
 import styles from './page.module.css';
 
+function renderIntro(intro) {
+  return intro.split(/(<strong>[^<]+<\/strong>)/).map((part, i) => {
+    const match = part.match(/^<strong>([^<]+)<\/strong>$/);
+    return match ? <strong key={i}>{match[1]}</strong> : part;
+  });
+}
+
 const categoryContent = {
   friend: {
     title: 'Gift Ideas for Friend',
@@ -146,9 +153,19 @@ export async function generateMetadata({ params }) {
   
   if (!content) return { title: 'Not Found' };
   
+  const url = `https://surprisehub.app/gift-ideas/${category}`;
   return {
     title: content.title,
     description: content.description,
+    alternates: { canonical: url },
+    openGraph: {
+      title: content.title,
+      description: content.description,
+      url,
+      images: [{ url: '/surprisehub_logowithtext.svg' }],
+      type: 'website',
+    },
+    twitter: { card: 'summary_large_image', title: content.title, description: content.description },
   };
 }
 
@@ -171,7 +188,7 @@ export default async function CategoryPage({ params }) {
       <article className={styles.article}>
         <header className={styles.hero}>
           <h1>{content.title}</h1>
-          <p className={styles.intro} dangerouslySetInnerHTML={{ __html: content.intro }} />
+          <p className={styles.intro}>{renderIntro(content.intro)}</p>
         </header>
 
         <section className={styles.content}>

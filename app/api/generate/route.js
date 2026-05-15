@@ -20,10 +20,10 @@ const client = new OpenAI({
 /** @type {import('zod').ZodSchema<GenerateInput>} */
 const generateSchema = z.object({
   age: z.coerce.string().trim().min(1).max(3),
-  relationship: z.string().trim().min(1).max(50),
+  relationship: z.string().trim().min(1).max(50).refine(v => !/[\n\r]/.test(v), "Newlines not allowed"),
   budget: z.coerce.string().trim().min(1).max(20),
-  interests: z.string().trim().min(1).max(200),
-  occasion: z.string().trim().min(1).max(50),
+  interests: z.string().trim().min(1).max(200).refine(v => !/[\n\r]/.test(v), "Newlines not allowed"),
+  occasion: z.string().trim().min(1).max(50).refine(v => !/[\n\r]/.test(v), "Newlines not allowed"),
   lang: z.string().trim().min(2).max(5).optional(),
 });
 
@@ -74,7 +74,7 @@ export async function POST(req) {
     ratelimitResult = await ratelimit.limit(ip);
   } catch (err) {
     console.error("Ratelimit error:", err);
-    ratelimitResult = { success: true, limit: 5, remaining: 5, reset: 0 };
+    ratelimitResult = { success: false, limit: 5, remaining: 0, reset: Date.now() + 60000 };
   }
 
   const { success, limit, remaining, reset } = ratelimitResult;

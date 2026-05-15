@@ -3,6 +3,59 @@ import { Resend } from "resend";
 /** @type {import('resend').Resend} */
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+const securityHeaders = {
+  "Content-Type": "application/json",
+  "X-Content-Type-Options": "nosniff",
+  "X-Frame-Options": "DENY",
+  "Referrer-Policy": "strict-origin-when-cross-origin",
+};
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "https://surprisehub.app",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type",
+};
+
+export async function OPTIONS() {
+  return new Response(null, {
+    status: 204,
+    headers: { ...securityHeaders, ...corsHeaders },
+  });
+}
+
+const emailStrings = {
+  de: {
+    subject: "Deine Geschenkideen von SurpriseHub 🎁",
+    heading: "Deine Geschenkideen",
+    intro: "Hier sind deine personalisierten Geschenkideen:",
+    outro: "Viel Spaß beim Verschenken!",
+  },
+  en: {
+    subject: "Your Gift Ideas from SurpriseHub 🎁",
+    heading: "Your Gift Ideas",
+    intro: "Here are your personalized gift ideas:",
+    outro: "Happy gifting!",
+  },
+  fr: {
+    subject: "Vos idées cadeaux de SurpriseHub 🎁",
+    heading: "Vos idées cadeaux",
+    intro: "Voici vos idées cadeaux personnalisées :",
+    outro: "Bonne chance pour les cadeaux !",
+  },
+  es: {
+    subject: "Tus ideas de regalo de SurpriseHub 🎁",
+    heading: "Tus ideas de regalo",
+    intro: "Aquí están tus ideas de regalo personalizadas:",
+    outro: "¡Buena suerte con los regalos!",
+  },
+  it: {
+    subject: "Le tue idee regalo da SurpriseHub 🎁",
+    heading: "Le tue idee regalo",
+    intro: "Ecco le tue idee regalo personalizzate:",
+    outro: "Buon regalo!",
+  },
+};
+
 /**
  * Escape HTML special characters to prevent XSS
  * @param {unknown} str
@@ -36,24 +89,24 @@ export async function POST(req) {
   } catch {
     return new Response(
       JSON.stringify({ error: "Invalid JSON body" }),
-      { status: 400 }
+      { status: 400, headers: { ...securityHeaders, ...corsHeaders } }
     );
   }
 
   try {
-    const { email, ideas } = body || {};
+    const { email, ideas, lang } = body || {};
 
     if (!isValidEmail(email)) {
       return new Response(
         JSON.stringify({ error: "Valid email address required" }),
-        { status: 400 }
+        { status: 400, headers: { ...securityHeaders, ...corsHeaders } }
       );
     }
 
     if (!ideas?.length) {
       return new Response(
         JSON.stringify({ error: "Missing ideas" }),
-        { status: 400 }
+        { status: 400, headers: { ...securityHeaders, ...corsHeaders } }
       );
     }
 
@@ -64,10 +117,11 @@ export async function POST(req) {
     if (sanitizedIdeas.length === 0) {
       return new Response(
         JSON.stringify({ error: "No valid ideas provided" }),
-        { status: 400 }
+        { status: 400, headers: { ...securityHeaders, ...corsHeaders } }
       );
     }
 
+    const strings = emailStrings[lang] ?? emailStrings.de;
     const htmlIdeas = sanitizedIdeas
       .map((idea) => `<li>${escapeHtml(idea)}</li>`)
       .join("");
@@ -75,25 +129,25 @@ export async function POST(req) {
     await resend.emails.send({
       from: "SurpriseHub 🎁 <hello@surprisehub.app>",
       to: email,
-      subject: "Deine Geschenkideen von SurpriseHub 🎁",
+      subject: strings.subject,
       html: `
-        <h2>🎁 Deine Geschenkideen</h2>
-        <p>Hier sind deine personalisierten Geschenkideen:</p>
+        <h2>🎁 ${strings.heading}</h2>
+        <p>${strings.intro}</p>
         <ul>${htmlIdeas}</ul>
-        <p>Viel Spaß beim Verschenken! 🎄</p>
+        <p>${strings.outro} 🎄</p>
         <hr />
         <small>SurpriseHub</small>
       `,
     });
 
     return new Response(JSON.stringify({ success: true }), {
-      headers: { "Content-Type": "application/json" },
+      headers: { ...securityHeaders, ...corsHeaders },
     });
   } catch (error) {
     console.error("Email send error:", error);
     return new Response(
       JSON.stringify({ error: "Failed to send email" }),
-      { status: 500 }
+      { status: 500, headers: { ...securityHeaders, ...corsHeaders } }
     );
   }
 }
